@@ -73,8 +73,13 @@
 2. [半夏瀉心湯](https://medical.nikkeibp.co.jp/inc/all/drugdic/prd/52/5200123D1079.html)
 食前に服用することでかなり症状を抑えれる
 
-#### どうでもよすぎる話
+<details><summary>どうでもよすぎる話</summary>
 
 どうでもいいですが、ずっと悪心をあくしんだと思っていましたが、おしんでした
 
 ![あくしんじゃないよ おしんだよ](image.png)
+
+</details>
+
+
+
