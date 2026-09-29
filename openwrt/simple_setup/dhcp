@@ -1,4 +1,4 @@
-# DHCP address pool for downstream VLAN clients (192.168.1.100 - 192.168.1.249)
+# DHCP address pool for downstream LAN clients (192.168.1.100 - 192.168.1.249)
 config dhcp 'lan'
 	option interface 'lan'
 	option start '100'
