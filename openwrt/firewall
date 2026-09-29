@@ -23,12 +23,14 @@ config zone 'zone_wan'
 	option masq '1'
 	option mtu_fix '1'
 
-# Rule 1: Drop all traffic from LAN targeting the upstream router and its local network
-config rule 'block_upstream_router'
-	option name 'Block-Upstream-Router-And-Subnet'
+# Rule 1: Drop all traffic from LAN targeting upstream private subnets (RFC 1918)
+config rule 'block_upstream_private'
+	option name 'Block-Upstream-Private-Subnets'
 	option src 'lan'
 	option dest 'wan'
-	option dest_ip '192.168.40.0/24'
+	list dest_ip '10.0.0.0/8'
+	list dest_ip '172.16.0.0/12'
+	list dest_ip '192.168.0.0/16'
 	option target 'DROP'
 
 # Rule 2: Forward transit traffic from LAN to WAN for standard internet browsing
