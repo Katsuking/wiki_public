@@ -1,45 +1,37 @@
-# Global default packet filtering policies
+# Default packet filtering policies
 config defaults
-	# Protect router from SYN flood attacks
 	option syn_flood '1'
-	# Reject packets entering router processes unless allowed
 	option input 'REJECT'
-	# Allow outbound packets originating from the router itself
 	option output 'ACCEPT'
-	# Reject inter-zone forward transit by default
 	option forward 'REJECT'
 
-# Downstream client LAN zone configuration
+# LAN firewall zone configuration (isolated downstream VLAN)
 config zone 'zone_lan'
 	option name 'lan'
 	list network 'lan'
-	# Allow management traffic from LAN clients (DNS, DHCP, SSH)
 	option input 'ACCEPT'
-	# Allow router replies back to LAN clients
 	option output 'ACCEPT'
-	# Allow intra-zone communication among clients on LAN
 	option forward 'ACCEPT'
 
-# Upstream WAN zone configuration
+# WAN firewall zone configuration with NAT masquerading enabled
 config zone 'zone_wan'
 	option name 'wan'
 	list network 'wan'
-	# Reject incoming connection attempts from upstream
 	option input 'REJECT'
-	# Allow router outbound traffic to upstream network
 	option output 'ACCEPT'
-	# Reject routed transit entering WAN
 	option forward 'REJECT'
-	# Enable source NAT masquerading for internet access
 	option masq '1'
-	# Adjust TCP MSS automatically
 	option mtu_fix '1'
 
-# Rule 1: Allow internet forwarding ONLY for traffic NOT targeting the parent network
-# Replaces config forwarding to prevent unconditional transit leaks
-config rule 'forward_internet_only'
-	option name 'Allow-LAN-to-Internet-Except-Upstream'
+# Rule 1: Drop all traffic from LAN targeting the upstream router and its local network
+config rule 'block_upstream_router'
+	option name 'Block-Upstream-Router-And-Subnet'
 	option src 'lan'
 	option dest 'wan'
-	option dest_ip '!192.168.40.0/24'
-	option target 'ACCEPT'
+	option dest_ip '192.168.40.0/24'
+	option target 'DROP'
+
+# Rule 2: Forward transit traffic from LAN to WAN for standard internet browsing
+config forwarding 'fwd_lan_wan'
+	option src 'lan'
+	option dest 'wan'
