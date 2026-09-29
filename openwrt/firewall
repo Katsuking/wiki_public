@@ -5,7 +5,7 @@ config defaults
 	option output 'ACCEPT'
 	option forward 'REJECT'
 
-# LAN firewall zone configuration (isolated downstream VLAN)
+# LAN firewall zone - downstream VLAN clients on eth1
 config zone 'zone_lan'
 	option name 'lan'
 	list network 'lan'
@@ -13,7 +13,7 @@ config zone 'zone_lan'
 	option output 'ACCEPT'
 	option forward 'ACCEPT'
 
-# WAN firewall zone configuration with NAT masquerading enabled
+# WAN firewall zone - upstream via eth0, NAT masquerade enabled
 config zone 'zone_wan'
 	option name 'wan'
 	list network 'wan'
@@ -23,17 +23,35 @@ config zone 'zone_wan'
 	option masq '1'
 	option mtu_fix '1'
 
-# Rule 1: Drop all traffic from LAN targeting upstream private subnets (RFC 1918)
-config rule 'block_upstream_private'
-	option name 'Block-Upstream-Private-Subnets'
+# Rule 1a: Block all protocols (incl. ICMP/ping) from LAN to 10.0.0.0/8 upstream
+# Must appear BEFORE the forwarding rule to take priority
+config rule 'block_upstream_10'
+	option name 'Block-Upstream-10.0.0.0/8'
 	option src 'lan'
 	option dest 'wan'
-	list dest_ip '10.0.0.0/8'
-	list dest_ip '172.16.0.0/12'
-	list dest_ip '192.168.0.0/16'
+	option dest_ip '10.0.0.0/8'
+	option proto 'all'
 	option target 'DROP'
 
-# Rule 2: Forward transit traffic from LAN to WAN for standard internet browsing
+# Rule 1b: Block all protocols (incl. ICMP/ping) from LAN to 172.16.0.0/12 upstream
+config rule 'block_upstream_172'
+	option name 'Block-Upstream-172.16.0.0/12'
+	option src 'lan'
+	option dest 'wan'
+	option dest_ip '172.16.0.0/12'
+	option proto 'all'
+	option target 'DROP'
+
+# Rule 1c: Block all protocols (incl. ICMP/ping) from LAN to 192.168.0.0/16 upstream
+config rule 'block_upstream_192'
+	option name 'Block-Upstream-192.168.40.0/16'
+	option src 'lan'
+	option dest 'wan'
+	option dest_ip '192.168.40.0/16'
+	option proto 'all'
+	option target 'DROP'
+
+# Rule 2: Allow LAN clients to reach the internet (public IPs only reach here)
 config forwarding 'fwd_lan_wan'
 	option src 'lan'
 	option dest 'wan'
