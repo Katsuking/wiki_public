@@ -5,11 +5,11 @@ config defaults
 	option output 'ACCEPT'
 	option forward 'REJECT'
 
-# LAN firewall zone - downstream VLAN clients on eth1
+# LAN firewall zone - downstream VLAN clients on eth1 (restricted router input)
 config zone 'zone_lan'
 	option name 'lan'
 	list network 'lan'
-	option input 'ACCEPT'
+	option input 'REJECT' # add a rule to allow router input
 	option output 'ACCEPT'
 	option forward 'ACCEPT'
 
@@ -22,6 +22,22 @@ config zone 'zone_wan'
 	option forward 'REJECT'
 	option masq '1'
 	option mtu_fix '1'
+
+# Allow DNS requests from server to OpenWrt router
+config rule 'allow_lan_dns'
+	option name 'Allow-LAN-DNS'
+	option src 'lan'
+	option proto 'tcpudp'
+	option dest_port '53'
+	option target 'ACCEPT'
+
+# Allow DHCP requests from server to OpenWrt router
+config rule 'allow_lan_dhcp'
+	option name 'Allow-LAN-DHCP'
+	option src 'lan'
+	option proto 'udp'
+	option dest_port '67-68'
+	option target 'ACCEPT'
 
 # Rule 1a: Block all protocols (incl. ICMP/ping) from LAN to 10.0.0.0/8 upstream
 # Must appear BEFORE the forwarding rule to take priority
@@ -44,10 +60,10 @@ config rule 'block_upstream_172'
 
 # Rule 1c: Block all protocols (incl. ICMP/ping) from LAN to 192.168.0.0/16 upstream
 config rule 'block_upstream_192'
-	option name 'Block-Upstream-192.168.40.0/16'
+	option name 'Block-Upstream-192.168.0.0/16'
 	option src 'lan'
 	option dest 'wan'
-	option dest_ip '192.168.40.0/16'
+	option dest_ip '192.168.0.0/16'
 	option proto 'all'
 	option target 'DROP'
 
