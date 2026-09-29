@@ -1,0 +1,31 @@
+# Loopback interface for local process communications
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+# Bridge device with VLAN filtering enabled for DSA architecture
+config device 'br_lan'
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth1'
+	option vlan_filtering '1'
+
+# VLAN 1 configuration binding eth1 as untagged port with PVID
+config bridge-vlan
+	option device 'br-lan'
+	option vlan '1'
+	list ports 'eth1:u*'
+
+# Downstream LAN interface bound to VLAN 1 (192.168.1.1/24)
+config interface 'lan'
+	option device 'br-lan.1'
+	option proto 'static'
+	option ipaddr '192.168.1.1'
+	option netmask '255.255.255.0'
+
+# Upstream WAN interface receiving address from parent router via DHCP
+config interface 'wan'
+	option device 'eth0'
+	option proto 'dhcp'

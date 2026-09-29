@@ -1,0 +1,37 @@
+# Default packet filtering policies
+config defaults
+	option syn_flood '1'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+
+# LAN firewall zone configuration
+config zone 'zone_lan'
+	option name 'lan'
+	list network 'lan'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'ACCEPT'
+
+# WAN firewall zone configuration with NAT masquerading enabled
+config zone 'zone_wan'
+	option name 'wan'
+	list network 'wan'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	option masq '1'
+	option mtu_fix '1'
+
+# Forward transit traffic from LAN to WAN for standard internet access
+config forwarding 'fwd_lan_wan'
+	option src 'lan'
+	option dest 'wan'
+
+# Subnet isolation: block all LAN traffic directed to 192.168.40.0/24
+config rule 'block_upstream'
+	option name 'Block-Upstream-LAN'
+	option src 'lan'
+	option dest '*'
+	option dest_ip '192.168.40.0/24'
+	option target 'REJECT'

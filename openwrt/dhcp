@@ -1,0 +1,11 @@
+# DHCP address pool for downstream LAN clients (192.168.1.100 - 192.168.1.249)
+config dhcp 'lan'
+	option interface 'lan'
+	option start '100'
+	option limit '150'
+	option leasetime '12h'
+
+# Suppress DHCP service on upstream WAN interface
+config dhcp 'wan'
+	option interface 'wan'
+	option ignore '1'
