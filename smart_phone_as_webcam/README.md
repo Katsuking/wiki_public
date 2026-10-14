@@ -25,6 +25,8 @@ scrcpy --video-source=camera \
   --video-bit-rate=2M \
   --video-codec=h264
 
+ffplay -f v4l2 /dev/video20 # 動作確認
+
 # --camera-size=1024x576 --camera-fps=15 等の使用可能な設定は要確認
 scrcpy --video-source=camera --list-camera-sizes
 ```
