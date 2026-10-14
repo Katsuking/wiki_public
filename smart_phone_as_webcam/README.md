@@ -35,3 +35,12 @@ scrcpy --video-source=camera --list-camera-sizes
 sudo modprobe -r v4l2loopback # 即座にモジュールアンロード
 ```
 
+### スクリプト化
+
+以下、個人用スクリプトをまとめておきます。
+
+`~/.bash_aliases`とかに記載
+
+```sh
+export PATH="$HOME/.local/bin:$PATH"
+```
